@@ -1,13 +1,11 @@
-
 import arcade
 import math
 import random
 import time
 
-
-
 WIDTH = 800
-HEIGHT = 800
+HEIGHT = 600
+
 TITLE = "TANK vs ROBOT"
 
 class Tank(arcade.Sprite):
