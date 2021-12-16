@@ -1,11 +1,13 @@
 
-import time
-import random
-import math
 import arcade
+import math
+import random
+import time
 
-WIDTH = 500
-HEIGHT = 500
+
+
+WIDTH = 800
+HEIGHT = 800
 TITLE = "TANK vs ROBOT"
 
 class Tank(arcade.Sprite):
@@ -43,15 +45,18 @@ class Tank(arcade.Sprite):
 
 class Enemy(arcade.Sprite):
     def __init__(self):
-        super().__init__(":resources:images/animated_characters/robot/robot_climb0.png")
+        super().__init__(":resources:images/animated_characters/robot/robot_fall.png")
         #super().__init__()
         self.center_x = random.randint(0,WIDTH)#
         self.center_y = 0
         self.width = 48
         self.height = 48
         self.speed = 4
-        #self.image_0 = arcade.load_texture(":resources:images/animated_characters/robot/robot_climb0.png")
-        #self.image = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
+        #self.angle = 0
+        # self.image_0 = arcade.load_texture(":resources:images/animated_characters/robot/robot_climb0.png")
+        #self.image_1 = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
+        #self.alive = 1
+        
         
     def move(self):
         self.center_y += self.speed
@@ -59,12 +64,15 @@ class Enemy(arcade.Sprite):
         # if self.center_y < 0:
         #     print("0")
         
+    # def draw_1(self):
+    #     arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48,self.image_1)
+
     # def draw(self):
-    #      arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image_0)
-
-    #def draw(self):
-        #arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image)
-
+    #     if self.alive == 1:
+    #         arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image_0)
+    #     elif self.alive == 0:
+    #         arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image_1)
+            
 
 class Bullet(arcade.Sprite):
     def __init__(self,host):
@@ -84,6 +92,7 @@ class Bullet(arcade.Sprite):
 class Game(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH,HEIGHT,TITLE,resizable=True)
+        #super().__init__(width=SCREEN_WIDTH-100,height=SCREEN_WIDTH-100,title=TITLE,resizable=True)
         arcade.set_background_color(arcade.color.BLACK)
         self.background_image = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
         
@@ -109,10 +118,10 @@ class Game(arcade.Window):
 
         if self.me.health > 0:
             text_scor = f"score : {self.me.score}"
-            arcade.draw_text(text_scor,10,5,arcade.color.BLACK,15)
+            arcade.draw_text(text_scor,10,5,arcade.color.PURPLE,15)
 
             lev = f"level : {self.me.level}"
-            arcade.draw_text(lev,205,5,arcade.color.BLUE,15)
+            arcade.draw_text(lev,350,5,arcade.color.BLUE,15)
 
 
             if self.me.health == 3:
@@ -122,7 +131,7 @@ class Game(arcade.Window):
             elif self.me.health == 1:
                 text_heal = f"health : ❤"
 
-            arcade.draw_text(text_heal,350,5,arcade.color.RED,15)
+            arcade.draw_text(text_heal,650,5,arcade.color.RED,15)
 
             
             # text_heal = "health: "
@@ -140,27 +149,44 @@ class Game(arcade.Window):
             
 
             self.me.draw()
+
             for enemy in self.enemy_list:
                 enemy.draw()
+                # if self.it.alive == 0:
+                    
+                #     enemy = arcade.draw_texture_rectangle(self.it.center_x, self.it.center_y, 48, 48,self.it.image_1)
+
+
+                #     #self.it.angle = 180
+                #     enemy.draw()
+                #     #self.it.draw_1()
+                
+
 
             #self.it.draw()
             for bullet in self.me.bullet_list:
                 bullet.draw()
+
+            
+
+
+
+
         else:
             self.background_image = arcade.load_texture(":resources:images/backgrounds/stars.png")
             self.over_music = arcade.load_sound(":resources:sounds/gameover3.wav")
             arcade.play_sound(self.over_music)       
             arcade.pause(0.5)
 
-            arcade.draw_text("GAME OVER!",0,250,arcade.color.RED,width=500,font_size=20,align='center')
+            arcade.draw_text("GAME OVER!",0,350,arcade.color.RED,width=800,font_size=20,align='center')
             text_fin_score = f"score: {self.me.score}"
-            arcade.draw_text(text_fin_score,0,200,arcade.color.WHITE,width=500,font_size=15,align='center') 
+            arcade.draw_text(text_fin_score,0,300,arcade.color.WHITE,width=800,font_size=15,align='center') 
             #arcade.stop_sound(player)
             
             #arcade.finish_render()
             #arcade.close_window()
         
-    def on_update(self, delta_time: float):
+    def on_update(self, delta_time):
         #self.me.move()
         self.me.rotate()
         self.end_time = time.time()
@@ -187,8 +213,9 @@ class Game(arcade.Window):
             self.me.level = 'MAX'
             #print("0")
             
+        timing = self.end_time - self.start_time
         #print(t)
-        if self.end_time - self.start_time > t:
+        if timing > t:
             #print(str(t) + ' 0')
             self.enemy_list.append(Enemy())
             self.start_time = time.time()
@@ -218,15 +245,28 @@ class Game(arcade.Window):
         for bullet in self.me.bullet_list:    
             for enemy in self.enemy_list:
                 if arcade.check_for_collision(bullet, enemy):
+                    #self.it.alive = 0
                     #self.it.draw()
+                    # dead = 1
+                    
+                    # if dead == 1:
+                        
+                    #     self.it.image = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
+                    #     self.it.draw()
+                    #     arcade.pause(1)
+
                     #enemy = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
                     #enemy = arcade.load_textures(":resources:images/animated_characters/robot/robot_fall.png",0,mirrored=True)
                     #enemy = arcade.load_spritesheet(":resources:images/animated_characters/robot/robot_fall.png")
+                    #arcade.pause(1)
+                    #self.it.angle = 180
+                    #self.enemy_list.clear()
+                    #self.enemy_list.pop()
+                    #self.enemy_list = arcade.load_texture_pair(":resources:images/animated_characters/robot/robot_fall.png")
                     self.enemy_list.remove(enemy)
                     self.me.bullet_list.remove(bullet)
                     self.me.score +=1
                     self.shot_music = arcade.load_sound(":resources:sounds/hurt4.wav")
-                    
                     arcade.play_sound(self.shot_music)       
                     
                 # elif arcade.check_for_collision(self.me,enemy):#
@@ -260,4 +300,5 @@ class Game(arcade.Window):
             self.me.change_angle = 0
 
 game = Game()
+game.center_window()
 arcade.run()
