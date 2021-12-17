@@ -101,19 +101,19 @@ class Game(arcade.Window):
             for robo in self.robot_list:
                 robo.draw()
 
-            for rocket in self.tank.rocket_list:
-                rocket.draw()
+            for rock in self.tank.rocket_list:
+                rock.draw()
 
         else:
             self.background_image = arcade.load_texture(PIC_OVER)
             self.over_music = arcade.load_sound(":resources:sounds/gameover3.wav")
             arcade.play_sound(self.over_music)       
             arcade.pause(0.5)
-            arcade.draw_text("GAME OVER!",0,350,arcade.color.RED,width=800,font_size=20,align='center')
+            arcade.draw_text("GAME OVER!",0,350,arcade.color.RED,width=800,bold=True,align='center')
             text_final_score = f"SCORE : {self.tank.score}"
-            arcade.draw_text(text_final_score,0,300,arcade.color.WHITE,width=800,font_size=15,align='center') 
+            arcade.draw_text(text_final_score,0,300,arcade.color.WHITE,width=800,align='center') 
             text_final_level = f"LEVEL : {self.tank.level}"
-            arcade.draw_text(text_final_level,0,250,arcade.color.GREEN,width=800,font_size=10,align='center') 
+            arcade.draw_text(text_final_level,0,250,arcade.color.GREEN,width=800,align='center') 
               
     def on_update(self, delta_time):
         self.tank.rotate()
@@ -153,14 +153,14 @@ class Game(arcade.Window):
             elif arcade.check_for_collision(self.tank,robo):
                 self.tank.health = 0 
                     
-        for rocket in self.tank.rocket_list:
-            rocket.move()
+        for rock in self.tank.rocket_list:
+            rock.move()
 
-        for rocket in self.tank.rocket_list:    
+        for rock in self.tank.rocket_list:    
             for robo in self.robot_list:
-                if arcade.check_for_collision(rocket, robo):
+                if arcade.check_for_collision(rock, robo):
                     self.robot_list.remove(robo)
-                    self.tank.rocket_list.remove(rocket)
+                    self.tank.rocket_list.remove(rock)
                     self.tank.score +=1
                     self.shot_music = arcade.load_sound(":resources:sounds/hurt4.wav")
                     arcade.play_sound(self.shot_music)       
