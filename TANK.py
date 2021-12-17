@@ -5,74 +5,48 @@ import time
 
 WIDTH = 800
 HEIGHT = 600
+SIZE = 55
 
 TITLE = "TANK vs ROBOT"
 
 class Tank(arcade.Sprite):
     def __init__(self):
         super().__init__(":resources:images/topdown_tanks/tank_red.png")
-        # self.center_x = WIDTH // 2
-        # self.center_y = 32
         self.center_x = WIDTH // 2
         self.center_y = HEIGHT - 50
-        
-        self.width = 48
-        self.height = 48
+        self.width = SIZE
+        self.height = SIZE
         self.angle = 0
         self.change_angle = 0
-        self.speed = 5
-        self.bullet_list = []
+        self.rotate_speed = 5
+        self.rocket_list = []
         self.score = 0
         self.health = 3
         self.level = 0
 
-    def fire(self):
-        self.bullet_list.append(Bullet(self))
-        self.fire_music = arcade.load_sound(":resources:sounds/hit4.wav")
-        arcade.play_sound(self.fire_music)
-        
-
-    # def move(self):
-    #     if self.change_angle == 1:
-    #         self.angle -=2.5 
-    #     elif self.change_angle == -1:
-    #         self.angle +=2.5
+    def rocket(self):
+        self.rocket_list.append(Rocket(self))
+        self.rocket_music = arcade.load_sound(":resources:sounds/hit4.wav")
+        arcade.play_sound(self.rocket_music)
 
     def rotate(self):
-        self.angle -= self.change_angle * self.speed
+        self.angle -= self.change_angle * self.rotate_speed
 
-class Enemy(arcade.Sprite):
+
+class Robot(arcade.Sprite):
     def __init__(self):
         super().__init__(":resources:images/animated_characters/robot/robot_fall.png")
-        #super().__init__()
-        self.center_x = random.randint(0,WIDTH)#
+        self.center_x = random.randint(0,WIDTH)
         self.center_y = 0
-        self.width = 48
-        self.height = 48
-        self.speed = 4
-        #self.angle = 0
-        # self.image_0 = arcade.load_texture(":resources:images/animated_characters/robot/robot_climb0.png")
-        #self.image_1 = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
-        #self.alive = 1
-        
+        self.width = SIZE
+        self.height = SIZE
+        self.move_speed = 3
         
     def move(self):
-        self.center_y += self.speed
-        #print(self.center_y)
-        # if self.center_y < 0:
-        #     print("0")
-        
-    # def draw_1(self):
-    #     arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48,self.image_1)
+        self.center_y += self.move_speed
 
-    # def draw(self):
-    #     if self.alive == 1:
-    #         arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image_0)
-    #     elif self.alive == 0:
-    #         arcade.draw_texture_rectangle(self.center_x, self.center_y, 48, 48, self.image_1)
-            
 
-class Bullet(arcade.Sprite):
+class Rocket(arcade.Sprite):
     def __init__(self,host):
         super().__init__(":resources:images/space_shooter/meteorGrey_tiny1.png")
         self.center_x = host.center_x
@@ -85,218 +59,117 @@ class Bullet(arcade.Sprite):
         self.center_x -= -self.speed * math.sin(a)
         self.center_y -= self.speed * math.cos(a)
 
-
-
 class Game(arcade.Window):
     def __init__(self):
-        super().__init__(WIDTH,HEIGHT,TITLE,resizable=True)
-        #super().__init__(width=SCREEN_WIDTH-100,height=SCREEN_WIDTH-100,title=TITLE,resizable=True)
+        super().__init__(WIDTH,HEIGHT,TITLE)
         arcade.set_background_color(arcade.color.BLACK)
         self.background_image = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
-        
-        #self.score = 0
-        
-        self.me = Tank()
-        self.it = Enemy()
-#        self.tir = Bullet()
-        self.enemy_list = []
+   
+        self.tank = Tank()
+        self.robot = Robot()
+        self.robot_list = []
         self.start_time = time.time()
 
     def on_draw(self):
         arcade.start_render()
         arcade.draw_lrwh_rectangle_textured(0,0,WIDTH,HEIGHT,self.background_image)
-        
-        # if self.it.center_y < 0:
-        #     print("0")
-        #     self.me.score = -1#
-        # for enemy in self.enemy_list:
-        #     if self.it.center_y < 0:
-        #         print("0")
-        #         self.me.score = -1#
 
-        if self.me.health > 0:
-            text_scor = f"score : {self.me.score}"
-            arcade.draw_text(text_scor,10,5,arcade.color.PURPLE,15)
+        if self.tank.health > 0:
+            text_score = f"SCORE : {self.tank.score}"
+            arcade.draw_text(text_score,10,5,arcade.color.PURPLE,15)
 
-            lev = f"level : {self.me.level}"
-            arcade.draw_text(lev,350,5,arcade.color.BLUE,15)
+            text_level = f"LEVEL : {self.tank.level}"
+            arcade.draw_text(text_level,350,5,arcade.color.BLUE,15)
 
+            if self.tank.health == 3:
+                text_heal = f"HEALTH :  ❤❤❤"
+            elif self.tank.health == 2:
+                text_heal = f"HEALTH : ❤❤"
+            elif self.tank.health == 1:
+                text_heal = f"HEALTH : ❤"
 
-            if self.me.health == 3:
-                text_heal = f"health:  ❤❤❤"
-            elif self.me.health == 2:
-                text_heal = f"health : ❤❤"
-            elif self.me.health == 1:
-                text_heal = f"health : ❤"
+            arcade.draw_text(text_heal,625,5,arcade.color.RED,15)
 
-            arcade.draw_text(text_heal,650,5,arcade.color.RED,15)
+            self.tank.draw()
 
-            
-            # text_heal = "health: "
-            # arcade.draw_text(text_heal,350,5,arcade.color.RED,15,bold=True)
+            for robo in self.robot_list:
+                robo.draw()
 
-            # for i in range(self.me.health):
-            #     i = "❤ "
-            #     #h = print(i)
-            #     arcade.draw_text(i,450,5,arcade.color.RED,15)
-
-
-            # #lev = "level: "
-            # arcade.draw_text('level',250,50,arcade.color.BLUE,15)
-            # arcade.draw_text(self.me.level,250,5,arcade.color.BLUE,15)
-            
-
-            self.me.draw()
-
-            for enemy in self.enemy_list:
-                enemy.draw()
-                # if self.it.alive == 0:
-                    
-                #     enemy = arcade.draw_texture_rectangle(self.it.center_x, self.it.center_y, 48, 48,self.it.image_1)
-
-
-                #     #self.it.angle = 180
-                #     enemy.draw()
-                #     #self.it.draw_1()
-                
-
-
-            #self.it.draw()
-            for bullet in self.me.bullet_list:
-                bullet.draw()
-
-            
-
-
-
+            for rocket in self.tank.rocket_list:
+                rocket.draw()
 
         else:
             self.background_image = arcade.load_texture(":resources:images/backgrounds/stars.png")
             self.over_music = arcade.load_sound(":resources:sounds/gameover3.wav")
             arcade.play_sound(self.over_music)       
             arcade.pause(0.5)
-
             arcade.draw_text("GAME OVER!",0,350,arcade.color.RED,width=800,font_size=20,align='center')
-            text_fin_score = f"score: {self.me.score}"
-            arcade.draw_text(text_fin_score,0,300,arcade.color.WHITE,width=800,font_size=15,align='center') 
-            #arcade.stop_sound(player)
-            
-            #arcade.finish_render()
-            #arcade.close_window()
-        
+            text_final_score = f"SCORE : {self.tank.score}"
+            arcade.draw_text(text_final_score,0,300,arcade.color.WHITE,width=800,font_size=15,align='center') 
+            text_final_level = f"LEVEL : {self.tank.level}"
+            arcade.draw_text(text_final_level,0,250,arcade.color.GREEN,width=800,font_size=10,align='center') 
+              
     def on_update(self, delta_time):
-        #self.me.move()
-        self.me.rotate()
-        self.end_time = time.time()
-
-        #t = random.randint(4,5)
+        self.tank.rotate()
+        self.end_time = time.time()   
         
-
-        
-        
-        if 0 <= self.me.score < 4:
-            t = random.randint(4,5)
-            #print("yek")
-            self.me.level = '1'
-        elif 4 <= self.me.score < 7:
-            t = random.randint(3,4)
-            #print("do")
-            self.me.level = '2'
-        elif 7 <= self.me.score < 10:
-            t = random.randint(2,3)
-            self.me.level = '3'
-            #print("se")
+        if 0 <= self.tank.score < 4:
+            random_time = random.randint(4,5)
+            self.tank.level = 1
+        elif 4 <= self.tank.score < 7:
+            random_time = random.randint(3,4)
+            self.tank.level = 2
+        elif 7 <= self.tank.score < 10:
+            random_time = random.randint(2,3)
+            self.tank.level = 3
         else:
-            t = 1
-            self.me.level = 'MAX'
-            #print("0")
-            
+            random_time = 1
+            self.tank.level = 'MAX'
+
         timing = self.end_time - self.start_time
-        #print(t)
-        if timing > t:
-            #print(str(t) + ' 0')
-            self.enemy_list.append(Enemy())
+        
+        if timing > random_time:
+            self.robot_list.append(Robot())
             self.start_time = time.time()
 
-        for enemy in self.enemy_list:
-            enemy.move()
+        for robo in self.robot_list:
+            robo.move()
             
-            #if enemy.center_y < 0:
-            if enemy.center_y > HEIGHT:
-                #print("0")
-                #self.me.score -=1
-                self.me.health -= 1
-                self.enemy_list.remove(enemy)
+            if robo.center_y > HEIGHT:
+                self.tank.health -= 1
+                self.robot_list.remove(robo)
                 self.range_music = arcade.load_sound(":resources:sounds/error5.wav")
                 arcade.play_sound(self.range_music)       
 
-            elif arcade.check_for_collision(self.me,enemy):#
-                    #self.enemy_list.remove(enemy)
-                    #self.me.bullet_list.remove(bullet)
-                    self.me.health = 0 
+            elif arcade.check_for_collision(self.tank,robo):
+                self.tank.health = 0 
                     
-            
+        for rocket in self.tank.rocket_list:
+            rocket.move()
 
-        for bullet in self.me.bullet_list:
-            bullet.move()
-
-        for bullet in self.me.bullet_list:    
-            for enemy in self.enemy_list:
-                if arcade.check_for_collision(bullet, enemy):
-                    #self.it.alive = 0
-                    #self.it.draw()
-                    # dead = 1
-                    
-                    # if dead == 1:
-                        
-                    #     self.it.image = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
-                    #     self.it.draw()
-                    #     arcade.pause(1)
-
-                    #enemy = arcade.load_texture(":resources:images/animated_characters/robot/robot_fall.png")
-                    #enemy = arcade.load_textures(":resources:images/animated_characters/robot/robot_fall.png",0,mirrored=True)
-                    #enemy = arcade.load_spritesheet(":resources:images/animated_characters/robot/robot_fall.png")
-                    #arcade.pause(1)
-                    #self.it.angle = 180
-                    #self.enemy_list.clear()
-                    #self.enemy_list.pop()
-                    #self.enemy_list = arcade.load_texture_pair(":resources:images/animated_characters/robot/robot_fall.png")
-                    self.enemy_list.remove(enemy)
-                    self.me.bullet_list.remove(bullet)
-                    self.me.score +=1
+        for rocket in self.tank.rocket_list:    
+            for robo in self.robot_list:
+                if arcade.check_for_collision(rocket, robo):
+                    self.robot_list.remove(robo)
+                    self.tank.rocket_list.remove(rocket)
+                    self.tank.score +=1
                     self.shot_music = arcade.load_sound(":resources:sounds/hurt4.wav")
                     arcade.play_sound(self.shot_music)       
                     
-                # elif arcade.check_for_collision(self.me,enemy):#
-                #     #self.enemy_list.remove(enemy)
-                #     #self.me.bullet_list.remove(bullet)
-                #     self.me.score = -1
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.SPACE:
+            self.tank.rocket() 
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.SPACE:
-            self.me.fire() 
-
-        if symbol == arcade.key.RIGHT:
-            #self.me.angle -= 10
-
-            self.me.change_angle = -1
-            #self.angle += self.change_angle * self.speed
-            
-            #self.tir.move(self)
-            
-        elif symbol == arcade.key.LEFT:
-            #self.me.angle += 10
-            
-            self.me.change_angle = 1
-            #self.angle += self.change_angle * self.speed
-
-            #self.tir.move(self)
-
+        if key == arcade.key.RIGHT:
+            self.tank.change_angle = -1
+          
+        elif key == arcade.key.LEFT:
+            self.tank.change_angle = 1
     
-    def on_key_release(self, symbol: int, modifiers: int):
-        if symbol == arcade.key.RIGHT or arcade.key.LEFT:
-            self.me.change_angle = 0
+    def on_key_release(self, key: int, modifiers: int):
+        if key == arcade.key.RIGHT or arcade.key.LEFT:
+            self.tank.change_angle = 0
 
-game = Game()
-game.center_window()
+my_game = Game()
+my_game.center_window()
 arcade.run()
