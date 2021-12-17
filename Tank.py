@@ -6,12 +6,16 @@ import time
 WIDTH = 800
 HEIGHT = 600
 SIZE = 55
-
+PIC_TANK = ":resources:images/topdown_tanks/tank_red.png"
+PIC_ROBOT = ":resources:images/animated_characters/robot/robot_fall.png"
+PIC_ROCKET = ":resources:images/space_shooter/meteorGrey_tiny1.png"
+PIC_GROUND = ":resources:images/backgrounds/abstract_2.jpg"
+PIC_OVER = ":resources:images/backgrounds/stars.png"
 TITLE = "TANK vs ROBOT"
 
 class Tank(arcade.Sprite):
     def __init__(self):
-        super().__init__(":resources:images/topdown_tanks/tank_red.png")
+        super().__init__(PIC_TANK)
         self.center_x = WIDTH // 2
         self.center_y = HEIGHT - 50
         self.width = SIZE
@@ -35,8 +39,8 @@ class Tank(arcade.Sprite):
 
 class Robot(arcade.Sprite):
     def __init__(self):
-        super().__init__(":resources:images/animated_characters/robot/robot_fall.png")
-        self.center_x = random.randint(0,WIDTH)
+        super().__init__(PIC_ROBOT)
+        self.center_x = random.randint(50,WIDTH-50)
         self.center_y = 0
         self.width = SIZE
         self.height = SIZE
@@ -48,9 +52,11 @@ class Robot(arcade.Sprite):
 
 class Rocket(arcade.Sprite):
     def __init__(self,host):
-        super().__init__(":resources:images/space_shooter/meteorGrey_tiny1.png")
+        super().__init__(PIC_ROCKET)
         self.center_x = host.center_x
         self.center_y = host.center_y
+        self.width = SIZE // 2
+        self.height = SIZE // 2
         self.speed = 6
         self.angle = host.angle
 
@@ -63,7 +69,7 @@ class Game(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH,HEIGHT,TITLE)
         arcade.set_background_color(arcade.color.BLACK)
-        self.background_image = arcade.load_texture(":resources:images/backgrounds/abstract_2.jpg")
+        self.background_image = arcade.load_texture(PIC_GROUND)
    
         self.tank = Tank()
         self.robot = Robot()
@@ -82,9 +88,9 @@ class Game(arcade.Window):
             arcade.draw_text(text_level,350,5,arcade.color.BLUE,15)
 
             if self.tank.health == 3:
-                text_heal = f"HEALTH :  ❤❤❤"
+                text_heal = f"HEALTH : ❤ ❤ ❤"
             elif self.tank.health == 2:
-                text_heal = f"HEALTH : ❤❤"
+                text_heal = f"HEALTH : ❤ ❤"
             elif self.tank.health == 1:
                 text_heal = f"HEALTH : ❤"
 
@@ -99,7 +105,7 @@ class Game(arcade.Window):
                 rocket.draw()
 
         else:
-            self.background_image = arcade.load_texture(":resources:images/backgrounds/stars.png")
+            self.background_image = arcade.load_texture(PIC_OVER)
             self.over_music = arcade.load_sound(":resources:sounds/gameover3.wav")
             arcade.play_sound(self.over_music)       
             arcade.pause(0.5)
@@ -114,22 +120,25 @@ class Game(arcade.Window):
         self.end_time = time.time()   
         
         if 0 <= self.tank.score < 4:
-            random_time = random.randint(4,5)
+            random_time = random.randint(5,6)
             self.tank.level = 1
         elif 4 <= self.tank.score < 7:
-            random_time = random.randint(3,4)
+            random_time = random.randint(4,5)
             self.tank.level = 2
         elif 7 <= self.tank.score < 10:
-            random_time = random.randint(2,3)
+            random_time = random.randint(3,4)
             self.tank.level = 3
         else:
-            random_time = 1
+            random_time = 2
             self.tank.level = 'MAX'
-
+        
         timing = self.end_time - self.start_time
         
         if timing > random_time:
             self.robot_list.append(Robot())
+            self.new_music = arcade.load_sound(":resources:sounds/hurt2.wav")
+            arcade.play_sound(self.new_music)      
+
             self.start_time = time.time()
 
         for robo in self.robot_list:
@@ -166,9 +175,10 @@ class Game(arcade.Window):
         elif key == arcade.key.LEFT:
             self.tank.change_angle = 1
     
-    def on_key_release(self, key: int, modifiers: int):
+    def on_key_release(self, key, modifiers):
         if key == arcade.key.RIGHT or arcade.key.LEFT:
             self.tank.change_angle = 0
+
 
 my_game = Game()
 my_game.center_window()
