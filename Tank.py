@@ -165,7 +165,7 @@ class Game(arcade.Window):
                     self.shot_music = arcade.load_sound(":resources:sounds/hurt4.wav")
                     arcade.play_sound(self.shot_music)       
                     
-    def on_key_press(self, key, modifiers):
+    def on_key_press(self, key , modifiers):
         if key == arcade.key.SPACE:
             self.tank.rocket() 
 
